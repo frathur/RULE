@@ -1,31 +1,42 @@
-#Working with PID for drone stabilization
+import tkinter as tk
+from tkinter import messagebox
+import random
 
-def pid_controller(desired_state, current_state, previous_error, kp, ki, kd, integral_sum,dt):
+# Function to generate a password
+def generate_password():
+    characterset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*"
+    length = 12  # Desired password length
+    # Generate password
+    password_list = random.choices(characterset, k=length)
+    password = ''.join(password_list)
+    password_entry.delete(0, tk.END)  # Clear the entry widget
+    password_entry.insert(0, password)  # Display the password in the entry widget
 
-    #calculate for error
-    error =  desired_state - current_state
+# Function to copy password to clipboard
+def copy_to_clipboard():
+    root.clipboard_clear()
+    root.clipboard_append(password_entry.get())
+    root.update()  # Update the clipboard
+    messagebox.showinfo("Success", "Password copied to clipboard!")
 
-    #Proportional Gained
-    p_term = kp * error
+# Tkinter GUI setup
+root = tk.Tk()
+root.title("Password Generator")
+root.geometry("400x200")
+root.resizable(False, False)
 
-    #Integral Gained
-    integral_sum += error * dt
-    i_term = ki * integral_sum
+# GUI elements
+title_label = tk.Label(root, text="Random Password Generator", font=("Arial", 16))
+title_label.pack(pady=10)
 
-    #Derivative Gained
-    derivative = (error - previous_error) / dt
-    d_term = kd * derivative
+password_entry = tk.Entry(root, font=("Arial", 14), width=30, justify="center")
+password_entry.pack(pady=10)
 
-    #Calculate PID
-    output = p_term + i_term + d_term
+generate_button = tk.Button(root, text="Generate Password", font=("Arial", 12), command=generate_password)
+generate_button.pack(pady=5)
 
-    previous_error = error
+copy_button = tk.Button(root, text="Copy to Clipboard", font=("Arial", 12), command=copy_to_clipboard)
+copy_button.pack(pady=5)
 
-    return output , previous_error, integral_sum
-
-roll_output, roll_previous_error, roll_integral_sum = pid_controller()
-yaw_output, yaw_previous_error, yaw_integral_sum = pid_controller()
-pitch_output, pitch_previous_error, pitch_integral_sum = pid_controller()
-
-
-
+# Run the Tkinter event loop
+root.mainloop()
